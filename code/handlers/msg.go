@@ -125,8 +125,7 @@ func newSendCard(header *larkcard.MessageCardHeader, elements ...larkcard.Messag
 		String()
 	return cardContent, err
 }
-func newSendCardWithOutHeader(
-	elements ...larkcard.MessageCardElement) (string, error) {
+func newSendCardWithOutHeader(elements ...larkcard.MessageCardElement) (string, error) {
 	config := larkcard.NewMessageCardConfig().
 		WideScreenMode(false).
 		EnableForward(true).
@@ -664,21 +663,16 @@ func sendOnProcessCard(ctx context.Context,
 	return id, nil
 }
 
-func updateTextCard(ctx context.Context, msg string,
-	msgId *string) error {
-	newCard, _ := newSendCardWithOutHeader(
-		withMainText(msg),
-		withNote("正在生成，请稍等..."))
+func updateTextCard(ctx context.Context, msg string, msgId *string) error {
+	newCard, _ := newSendCardWithOutHeader(withMainText(msg), withNote("正在生成，请稍等..."))
 	err := PatchCard(ctx, msgId, newCard)
 	if err != nil {
 		return err
 	}
 	return nil
 }
-func updateFinalCard(ctx context.Context, msg string,
-	msgId *string) error {
-	newCard, _ := newSendCardWithOutHeader(
-		withMainText(msg))
+func updateFinalCard(ctx context.Context, msg string, msgId *string) error {
+	newCard, _ := newSendCardWithOutHeader(withMainText(msg))
 	err := PatchCard(ctx, msgId, newCard)
 	if err != nil {
 		return err

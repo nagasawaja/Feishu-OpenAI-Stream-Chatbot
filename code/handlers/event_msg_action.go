@@ -45,6 +45,7 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 
 	answer := ""
 	chatResponseStream := make(chan string)
+	panicFlag := false
 	done := make(chan struct{}) // 添加 done 信号，保证 goroutine 正确退出
 	noContentTimeout := time.AfterFunc(10*time.Second, func() {
 		pp.Println("no content timeout")
@@ -61,27 +62,26 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 		Role: "user", Content: a.info.qParsed,
 	})
 	go func() {
-		defer func() {
-			if err := recover(); err != nil {
-				err := updateFinalCard(*a.ctx, "聊天失败", cardId)
-				if err != nil {
-					printErrorMessage(a, msg, err)
-					return
-				}
-			}
-		}()
+		//defer func() {
+		//	if err := recover(); err != nil {
+		//		err := updateFinalCard(*a.ctx, answer+"----------聊天失败", cardId)
+		//		if err != nil {
+		//			printErrorMessage(a, msg, err)
+		//			return
+		//		}
+		//	}
+		//}()
 
 		//log.Printf("UserId: %s , Request: %s", a.info.userId, msg)
 
 		if err := m.chatgpt.StreamChat(*a.ctx, msg, chatResponseStream); err != nil {
-			err := updateFinalCard(*a.ctx, "聊天失败", cardId)
+			panicFlag = true
+			close(done) // 关闭 done 信号
 			if err != nil {
 				printErrorMessage(a, msg, err)
 				return
 			}
-			close(done) // 关闭 done 信号
 		}
-
 		close(done) // 关闭 done 信号
 	}()
 	ticker := time.NewTicker(700 * time.Millisecond)
@@ -111,6 +111,10 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 			answer += res
 			//pp.Println("answer", answer)
 		case <-done: // 添加 done 信号的处理
+			time.Sleep(1500 * time.Millisecond)
+			if panicFlag == true {
+				answer = answer + "-----------答案不完整"
+			}
 			err := updateFinalCard(*a.ctx, answer, cardId)
 			if err != nil {
 				printErrorMessage(a, msg, err)
@@ -128,7 +132,7 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 			//	//updateNewTextCard(*a.ctx, a.info.sessionId, a.info.msgId,
 			//	//	completions.Content)
 			//}
-			log.Printf("Success request: UserId: %s , Request: %s , Response: %s", a.info.userId, msg, answer)
+			//log.Printf("Success request: UserId: %s , Request: %s , Response: %s", a.info.userId, msg, answer)
 			return false
 		}
 	}

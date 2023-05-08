@@ -28,9 +28,7 @@ func NewGpt3(config *initialization.Config) *ChatGPT {
 	return &ChatGPT{config: config}
 }
 
-func (c *ChatGPT) StreamChat(ctx context.Context,
-	msg []customOpenai.Messages,
-	responseStream chan string) error {
+func (c *ChatGPT) StreamChat(ctx context.Context, msg []customOpenai.Messages, responseStream chan string) error {
 	//change msg type from Messages to openai.ChatCompletionMessage
 	chatMsgs := make([]openai.ChatCompletionMessage, len(msg))
 	for i, m := range msg {
@@ -39,13 +37,10 @@ func (c *ChatGPT) StreamChat(ctx context.Context,
 			Content: m.Content,
 		}
 	}
-	return c.StreamChatWithHistory(ctx, chatMsgs, 2000,
-		responseStream)
+	return c.StreamChatWithHistory(ctx, chatMsgs, 2000, responseStream)
 }
 
-func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCompletionMessage, maxTokens int,
-	responseStream chan string,
-) error {
+func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCompletionMessage, maxTokens int, responseStream chan string) error {
 	config := openai.DefaultConfig(c.config.OpenaiApiKeys[0])
 	config.BaseURL = c.config.OpenaiApiUrl + "/v1"
 
@@ -58,12 +53,13 @@ func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCo
 	client := openai.NewClientWithConfig(config)
 	//pp.Printf("client: %v", client)
 	req := openai.ChatCompletionRequest{
-		Model:       openai.GPT3Dot5Turbo,
+		Model:       openai.GPT40314,
 		Messages:    msg,
 		N:           1,
 		Temperature: 0.7,
 		MaxTokens:   maxTokens,
 		TopP:        1,
+		Stream:      true,
 		//Moderation:     true,
 		//ModerationStop: true,
 	}
@@ -76,7 +72,6 @@ func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCo
 	for {
 		response, err := stream.Recv()
 		if errors.Is(err, io.EOF) {
-			//fmt.Println("Stream finished")
 			return nil
 		}
 		if err != nil {
@@ -85,6 +80,4 @@ func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCo
 		}
 		responseStream <- response.Choices[0].Delta.Content
 	}
-	return nil
-
 }

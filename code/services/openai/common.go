@@ -186,7 +186,7 @@ func (gpt *ChatGPT) sendRequestWithBodyType(link, method string,
 func GetProxyClient(proxyString string) (*http.Client, error) {
 	var client *http.Client
 	if proxyString == "" {
-		client = &http.Client{Timeout: 110 * time.Second}
+		client = &http.Client{Timeout: 500 * time.Second}
 	} else {
 		proxyUrl, err := url.Parse(proxyString)
 		if err != nil {
@@ -197,7 +197,7 @@ func GetProxyClient(proxyString string) (*http.Client, error) {
 		}
 		client = &http.Client{
 			Transport: transport,
-			Timeout:   110 * time.Second,
+			Timeout:   500 * time.Second,
 		}
 	}
 	return client, nil

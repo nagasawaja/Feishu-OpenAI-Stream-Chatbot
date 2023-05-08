@@ -7,7 +7,9 @@ import (
 	"start-feishubot/services"
 	"start-feishubot/services/chatgpt"
 	"start-feishubot/services/openai"
+	"strconv"
 	"strings"
+	"time"
 
 	larkcard "github.com/larksuite/oapi-sdk-go/v3/card"
 
@@ -55,6 +57,7 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 		fmt.Println("unknown chat type")
 		return nil
 	}
+
 	//fmt.Println(larkcore.Prettify(event.Event.Message))
 
 	msgType, err := judgeMsgType(event)
@@ -68,6 +71,14 @@ func (m MessageHandler) msgReceivedHandler(ctx context.Context, event *larkim.P2
 	rootId := event.Event.Message.RootId
 	chatId := event.Event.Message.ChatId
 	mention := event.Event.Message.Mentions
+	msgCreateTime, err := strconv.ParseInt(*(event.Event.Message.CreateTime), 10, 64)
+	if err == nil {
+		bb := time.Now().UnixMilli() - 1000*30
+		if msgCreateTime <= bb {
+			fmt.Printf("msg is too old; %d--%d", msgCreateTime, bb)
+			return nil
+		}
+	}
 
 	sessionId := rootId
 	if sessionId == nil || *sessionId == "" {

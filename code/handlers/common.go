@@ -45,8 +45,9 @@ func processMessage(msg interface{}) (string, error) {
 }
 
 func processNewLine(msg string) string {
-	return strings.Replace(msg, "\\n", `
+	aa := strings.Replace(msg, "\\n", `
 `, -1)
+	return strings.Replace(aa, "\\t", `    `, -1)
 }
 
 func processQuote(msg string) string {

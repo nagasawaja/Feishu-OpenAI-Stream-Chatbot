@@ -59,7 +59,6 @@ func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCo
 		Temperature: 0.7,
 		MaxTokens:   maxTokens,
 		TopP:        1,
-		Stream:      true,
 		//Moderation:     true,
 		//ModerationStop: true,
 	}

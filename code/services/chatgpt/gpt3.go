@@ -53,10 +53,10 @@ func (c *ChatGPT) StreamChatWithHistory(ctx context.Context, msg []openai.ChatCo
 	client := openai.NewClientWithConfig(config)
 	//pp.Printf("client: %v", client)
 	req := openai.ChatCompletionRequest{
-		Model:       openai.GPT40314,
+		Model:       openai.GPT4,
 		Messages:    msg,
 		N:           1,
-		Temperature: 0.7,
+		Temperature: 0.2,
 		MaxTokens:   maxTokens,
 		TopP:        1,
 		//Moderation:     true,

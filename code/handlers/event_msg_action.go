@@ -62,15 +62,15 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 		Role: "user", Content: a.info.qParsed,
 	})
 	go func() {
-		//defer func() {
-		//	if err := recover(); err != nil {
-		//		err := updateFinalCard(*a.ctx, answer+"----------聊天失败", cardId)
-		//		if err != nil {
-		//			printErrorMessage(a, msg, err)
-		//			return
-		//		}
-		//	}
-		//}()
+		defer func() {
+			if err := recover(); err != nil {
+				err := updateFinalCard(*a.ctx, answer+"----------聊天失败----大概率是gpt4限流，等下再试", cardId)
+				if err != nil {
+					printErrorMessage(a, msg, err)
+					return
+				}
+			}
+		}()
 
 		//log.Printf("UserId: %s , Request: %s", a.info.userId, msg)
 
@@ -111,7 +111,7 @@ func (m *MessageAction) Execute(a *ActionInfo) bool {
 			answer += res
 			//pp.Println("answer", answer)
 		case <-done: // 添加 done 信号的处理
-			time.Sleep(1500 * time.Millisecond)
+			time.Sleep(2500 * time.Millisecond)
 			if panicFlag == true {
 				answer = answer + "-----------答案不完整"
 			}

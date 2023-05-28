@@ -35,6 +35,7 @@ type Config struct {
 	AzureOpenaiToken                   string
 	AccessControlEnable                bool
 	AccessControlMaxCountPerUserPerDay int
+	GptVersion                         string
 }
 
 var (
@@ -71,6 +72,7 @@ func LoadConfig(cfg string) *Config {
 	//fmt.Println(string(content))
 
 	config := &Config{
+		GptVersion:                         getViperStringValue("GPT_VERSION", "gpt3.5"),
 		EnableLog:                          getViperBoolValue("ENABLE_LOG", false),
 		FeishuAppId:                        getViperStringValue("APP_ID", ""),
 		FeishuAppSecret:                    getViperStringValue("APP_SECRET", ""),

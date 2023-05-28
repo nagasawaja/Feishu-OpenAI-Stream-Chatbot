@@ -34,6 +34,7 @@ type AzureConfig struct {
 }
 
 type ChatGPT struct {
+	GptVersion  string
 	Lb          *loadbalancer.LoadBalancer
 	ApiKey      []string
 	ApiUrl      string
@@ -218,11 +219,12 @@ func NewChatGPT(config initialization.Config) *ChatGPT {
 	}
 
 	return &ChatGPT{
-		Lb:        lb,
-		ApiKey:    config.OpenaiApiKeys,
-		ApiUrl:    config.OpenaiApiUrl,
-		HttpProxy: config.HttpProxy,
-		Platform:  platform,
+		GptVersion: config.GptVersion,
+		Lb:         lb,
+		ApiKey:     config.OpenaiApiKeys,
+		ApiUrl:     config.OpenaiApiUrl,
+		HttpProxy:  config.HttpProxy,
+		Platform:   platform,
 		AzureConfig: AzureConfig{
 			BaseURL:        AzureApiUrlV1,
 			ResourceName:   config.AzureResourceName,

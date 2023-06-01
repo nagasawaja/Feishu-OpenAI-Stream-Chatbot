@@ -170,7 +170,7 @@ func (config *Config) GetKeyFile() string {
 func filterFormatKey(keys []string) []string {
 	var result []string
 	for _, key := range keys {
-		if strings.HasPrefix(key, "sk-") {
+		if strings.HasPrefix(key, "sk-") || strings.HasPrefix(key, "sb-") {
 			result = append(result, key)
 		}
 	}
